@@ -14,39 +14,29 @@ class App extends React.Component {
       }
     }
   }
- onFindPetsClick = () => {
-    let type = this.state.filters.type
-    
-    if (type === 'all') {
+ fetchPets = () => {
+    let endpoint = '/api/pets';
 
-      fetch('/api/pets')
-        .then(resp => resp.json())
-        .then(json =>  
-          this.setState({
-            pets: json
-          }))
-        .catch(error => console.log(error))  
-    } else {
-      
-      fetch(`/api/pets?type=${type}`)
-        .then(resp => resp.json())
-        .then(json => 
-          this.setState({pets: json})
-        )
+    if (this.state.filters.type !== 'all') {
+      endpoint += `?type=${this.state.filters.type}`;
     }
-  }
+
+    fetch(endpoint)
+      .then(res => res.json())
+      .then(pets => this.setState({ pets: pets }));
+  };
 
   onChangeType = ({ target: { value } }) => {
-    this.setState({ filters: { ...this.state.filters, type: value } })
+    this.setState({ filters: { ...this.state.filters, type: value } });
   };
 
   onAdoptPet = petId => {
-    let pets = this.state.pets.map(p => {
-      return p.id === petId ? {...p, isAdopted: true} : p;
-    })
-    this.setState({pets: pets})
-    
-  }
+    const pets = this.state.pets.map(p => {
+      return p.id === petId ? { ...p, isAdopted: true } : p;
+    });
+    this.setState({ pets: pets });
+  };
+
   render() {
     return (
       <div className="ui container">
